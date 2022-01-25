@@ -1,5 +1,9 @@
 #version 330 core
 
+/** http://mercury.sexy/hg_sdf/
+A glsl library for building signed distance functions */
+#include hg_sdf.glsl
+
 layout (location = 0) out vec4 fragColor;
 
 uniform vec2 u_resolution;
@@ -11,9 +15,9 @@ const float EPSILON = .001;
 
 vec2 map(vec3 p) {
     // endless repetition of objects
-    p = mod(p, 4.) - 4. * .5;
+    pMod3(p, vec3(5));
     // sphere
-    float sphereDist = length(p) - 1.;
+    float sphereDist = fSphere(p, 1.);
     float sphereID = 1.;
     return vec2(sphereDist, sphereID);
 }
@@ -28,7 +32,7 @@ vec2 rayMarch(vec3 ro, vec3 rd) {
         obj.x += hit.x;
         obj.y = hit.y;
 
-        if(abs(hit.x) < EPSILON || obj.x > MAX_DIST)
+        if (abs(hit.x) < EPSILON || obj.x > MAX_DIST)
             break;
     }
     return obj;
