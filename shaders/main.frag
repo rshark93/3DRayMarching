@@ -7,6 +7,7 @@ A glsl library for building signed distance functions */
 layout (location = 0) out vec4 fragColor;
 
 uniform vec2 u_resolution;
+uniform vec2 u_mouse;
 
 const float ROV = 1.; // region of view
 const int MAX_STEPS = 256;
@@ -101,8 +102,15 @@ mat3 getCamera(vec3 ro, vec3 lookAt){
     return mat3(camR, camU, camF);
 }
 
+void mouseControl(inout vec3 ro){
+    vec2 m = u_mouse / u_resolution;
+    pR(ro.yz, m.y * PI * .5 - .5);
+    pR(ro.xz, m.x * TAU);
+}
+
 void render(inout vec3 col, in vec2 uv) {
     vec3 ro = vec3(3., 3., -3.);
+    mouseControl(ro);
     vec3 lookAt = vec3(0, 0, 0);
     // rd formed along the Z axis of the camera
     vec3 rd = getCamera(ro, lookAt) * normalize(vec3(uv, ROV));

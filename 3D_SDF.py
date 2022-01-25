@@ -17,8 +17,8 @@ class Main(mglw.WindowConfig):
         #self.program['u_time'] = time
         self.quad.render(self.program)
 
-    # def mouse_position_event(self, x, y, dx, dy):
-    #     self.program['u_mouse'] = (x, y)
+    def mouse_position_event(self, x, y, dx, dy):
+        self.program['u_mouse'] = (x, y)
 
 
 if __name__ == '__main__':
