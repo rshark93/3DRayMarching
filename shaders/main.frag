@@ -65,7 +65,27 @@ vec3 getLighting(vec3 p, vec3 rd, vec3 color) {
     vec3 L = normalize(lightPos - p);
     vec3 N = getNormal(p);
 
-    return color * clamp(dot(L, N), 0., 1.);
+    vec3 diffuse = color * clamp(dot(L, N), 0., 1.);
+
+    // adding shadows
+    float d = rayMarch(p +N * .02, normalize(lightPos)).x;
+    if (d < length(lightPos - p)) return vec3(0);
+
+    return diffuse;
+}
+
+vec3 getColorMaterial(vec3 p, float id){
+    vec3 m;
+    switch(int(id)) {
+        case 1: m = vec3(.9, .0, .0);
+            break;
+        // chess texture
+        case 2: m = vec3(.2 + .4 * mod(floor(p.x) + floor(p.z), 2.));
+            break;
+        case 3: m = vec3(.5,.5,.9);
+            break;
+    }
+    return m;
 }
 
 void render(inout vec3 col, in vec2 uv) {
@@ -77,7 +97,8 @@ void render(inout vec3 col, in vec2 uv) {
 
     if (obj.x < MAX_DIST) {
         vec3 p = ro + obj.x * rd;
-        col +=getLighting(p, rd, vec3(1));
+        vec3 color = getColorMaterial(p, obj.y);
+        col += getLighting(p, rd, color);
     }
 }
 
@@ -87,5 +108,7 @@ void main() {
     vec3 col;
     render(col, uv);
 
+    // gamma correction
+    col = pow(col, vec3(.454545));
     fragColor = vec4(col, 1.);
 }
