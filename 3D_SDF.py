@@ -2,7 +2,7 @@ import moderngl_window as mglw
 
 
 class Main(mglw.WindowConfig):
-    window_size = 800, 600
+    window_size = 1440, 900
     resource_dir = 'shaders'
 
     def __init__(self, **kwargs):
