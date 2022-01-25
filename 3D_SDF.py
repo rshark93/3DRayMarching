@@ -2,7 +2,7 @@ import moderngl_window as mglw
 
 
 class Main(mglw.WindowConfig):
-    window_size = 1440, 900
+    window_size = 1280, 960
     resource_dir = 'shaders'
 
     def __init__(self, **kwargs):
@@ -14,7 +14,7 @@ class Main(mglw.WindowConfig):
 
     def render(self, time, frame_time):
         self.ctx.clear()
-        #self.program['u_time'] = time
+        self.program['u_time'] = time
         self.quad.render(self.program)
 
     def mouse_position_event(self, x, y, dx, dy):
