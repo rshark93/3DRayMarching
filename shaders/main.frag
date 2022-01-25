@@ -95,10 +95,15 @@ void render(inout vec3 col, in vec2 uv) {
 
     vec2 obj = rayMarch(ro, rd);
 
+    vec3 background = vec3(.5, .8, .9);
     if (obj.x < MAX_DIST) {
         vec3 p = ro + obj.x * rd;
         vec3 color = getColorMaterial(p, obj.y);
         col += getLighting(p, rd, color);
+        //  fog for background smoothing
+        col = mix(col, background, 1. - exp(-.0008 * obj.x * obj.x));
+    } else { // adding background color
+        col += background - max(.95 * rd.y, 0.);
     }
 }
 
