@@ -13,13 +13,25 @@ const int MAX_STEPS = 256;
 const float MAX_DIST = 500;
 const float EPSILON = .001;
 
+vec2 fOpUnionID(vec2 res1, vec2 res2) {
+    return res1.x < res2.x ? res1 : res2;
+}
+
 vec2 map(vec3 p) {
     // endless repetition of objects
-    pMod3(p, vec3(5));
+    //pMod3(p, vec3(5));
+
+    // plane
+    float planeDist = fPlane(p, vec3(0, 1, 0), 1.);
+    float planeID = 2.;
+    vec2 plane = vec2(planeDist, planeID);
+
     // sphere
     float sphereDist = fSphere(p, 1.);
     float sphereID = 1.;
-    return vec2(sphereDist, sphereID);
+    vec2 sphere = vec2(sphereDist, sphereID);
+    //result
+    return fOpUnionID(sphere, plane);
 }
 
 /* return 2-dimensional vector object for save distance to object into X
@@ -38,6 +50,24 @@ vec2 rayMarch(vec3 ro, vec3 rd) {
     return obj;
 }
 
+// gradient of plane
+vec3 getNormal(vec3 p){
+    vec2 e = vec2(EPSILON, 0.);
+    vec3 n = vec3(map(p).x) - vec3(map(p - e.xyy).x, map(p - e.yxy).x, map(p - e.yyx).x);
+    return normalize(n);
+}
+
+/** Lambertian Reflection
+https://en.wikipedia.org/wiki/Lambertian_reflectance
+*/
+vec3 getLighting(vec3 p, vec3 rd, vec3 color) {
+    vec3 lightPos = vec3(20., 40., -30.);
+    vec3 L = normalize(lightPos - p);
+    vec3 N = getNormal(p);
+
+    return color * clamp(dot(L, N), 0., 1.);
+}
+
 void render(inout vec3 col, in vec2 uv) {
     vec3 ro = vec3(0.,0.,-3.);
     // rd formed along the Z axis of the camera
@@ -45,8 +75,10 @@ void render(inout vec3 col, in vec2 uv) {
 
     vec2 obj = rayMarch(ro, rd);
 
-    if (obj.x < MAX_DIST)
-        col += 3. / obj.x;
+    if (obj.x < MAX_DIST) {
+        vec3 p = ro + obj.x * rd;
+        col +=getLighting(p, rd, vec3(1));
+    }
 }
 
 void main() {
